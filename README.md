@@ -17,5 +17,4 @@ The goal of this project is to disguise your web surfing habits from your ISP or
 * Built on .NET 2.0 for maximum compatibility
 
 ## TO DO
-* Finalize automated algorithm
 * Resolve minor issues with slow response from some DNS servers
