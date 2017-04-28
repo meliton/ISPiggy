@@ -1,8 +1,11 @@
-﻿Imports System.Net
+Imports System.Net
 Module Common
-    Public Const sTitle = "ISPiggy" ' title of program
-    Public Const iMinDomain = 5     ' minimum word size for domain name
-    Public Const iMaxDomain = 8     ' maximum word size for domain name
+    Public Const sTitle = "ISPiggy"             ' title of program
+    Public Const iMinDomain = 5                 ' minimum word size for domain name
+    Public Const iMaxDomain = 8                 ' maximum word size for domain name
+    Public Const sSuccess = "Success! "         ' message for successful/valid domain
+    Public Const sLblName = "Random Domain: "   ' random domain label set
+    Public iStopper As Integer                  ' declare global stopper
 
     '---------------------------------------------------------------------------------------
     ' Procedure : myRandom
@@ -52,7 +55,6 @@ Module Common
         End If
 
         toDotCom = strToCom
-
     End Function
 
     '---------------------------------------------------------------------------------------
@@ -88,7 +90,6 @@ Module Common
         intDom = myRandom(0, UBound(astrTLDsuffix))
 
         makeDomainName = sRandWeb & astrTLDsuffix(intDom)
-
     End Function
 
     '---------------------------------------------------------------------------------------
@@ -124,7 +125,6 @@ Module Common
         End If
 
         domainMinusOne = strDomain
-
     End Function
 
     '---------------------------------------------------------------------------------------
@@ -166,7 +166,6 @@ Module Common
         End If
 
         domainMinusRand = strDomain
-
     End Function
 
     '---------------------------------------------------------------------------------------
@@ -176,34 +175,32 @@ Module Common
     '---------------------------------------------------------------------------------------
     Public Function checkDebugMode(ByVal frm As Form)
         If Form1.chkDebug.Checked Then          ' we are in debug mode
-            frm.Size = New Size(590, 150)               ' sets debug form size
-            frm.MaximumSize = New Size(590, 150)        ' disables resizing up
-            frm.MinimumSize = New Size(590, 150)        ' disables resizing down
-            Form1.ToolStripStatusLabel1.Text = "Entering interactive DEBUG mode"
+            frm.Size = New Size(580, 150)               ' sets debug form size
+            frm.MaximumSize = New Size(580, 150)        ' disables resizing up
+            frm.MinimumSize = New Size(580, 150)        ' disables resizing down
+            Form1.stat01.text = "Entering interactive DEBUG mode"
 
             Form1.btnStart.Enabled = False                ' disable stop and start buttons
             Form1.btnStop.Enabled = False
 
         Else                                    ' we are in production mode
-            frm.Size = New Size(270, 150)               ' sets production form size
-            frm.MaximumSize = New Size(270, 150)        ' disables resizing up
-            frm.MinimumSize = New Size(270, 150)        ' disables resizing down
-            Form1.ToolStripStatusLabel1.Text = "Press START to Begin"
+            frm.Size = New Size(320, 150)               ' sets production form size
+            frm.MaximumSize = New Size(320, 150)        ' disables resizing up
+            frm.MinimumSize = New Size(320, 150)        ' disables resizing down
+            Form1.stat01.Text = "Press START to Begin"
 
-            Form1.btnStart.Enabled = True                ' enable stop and start buttons
-            Form1.btnStop.Enabled = True
-            Form1.lblName.Text = "Random domain: "      ' resets domain text
+            Form1.btnStart.Enabled = True      ' enable start button
+            Form1.lblName.Text = sLblName      ' resets domain text
 
         End If
 
         checkDebugMode = 0
-
     End Function
 
     Public Function DoGetHostEntry(hostName As String)
         Form1.btnIndicator.BackColor = Color.Red  ' visual wait indicator
         Form1.GetIP.Enabled = False       ' disable the button to avoid a double press
-        Form1.ToolStripStatusLabel1.Text = "Working ..."
+        Form1.stat01.Text = "WORKING HARD... PLEASE WAIT..."
         Form1.Refresh()          'needed to paint the the shapes before next operation
 
         Try
@@ -211,18 +208,15 @@ Module Common
             Dim sMyString As String
             sMyString = ""
 
-            ' Console.WriteLine("GetHostEntry(" + hostName + ") returns: ")
-
             Dim ip As IPAddress() = host.AddressList
 
-            'Console.WriteLine(ip(0))   ' get first IP returned from DNS server
-            sMyString = ip(0).ToString()
-            Form1.ToolStripStatusLabel1.Text = "Success! " & sMyString & " Found!"
+            sMyString = ip(0).ToString()    ' get first IP returned from DNS server
+            Form1.stat01.Text = sSuccess & sMyString & " Found!"
 
         Catch ex As System.Net.Sockets.SocketException
-            Form1.ToolStripStatusLabel1.Text = ex.Message & "... trying next host..."
+            Form1.stat01.Text = ex.Message & "... trying next host..."
         Catch ex As System.Exception
-            Form1.ToolStripStatusLabel1.Text = ex.Message
+            Form1.stat01.Text = ex.Message
         Finally
         End Try
 
