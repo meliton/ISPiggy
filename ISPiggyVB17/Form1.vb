@@ -1,4 +1,4 @@
-﻿Public Class Form1
+Public Class Form1
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Text = sTitle
         chkDebug.Checked = False
@@ -11,9 +11,11 @@
 
         Randomize()
 
-        lblName.Text = "Random domain: "
+        lblName.Text = sLblName
         btnIndicator.BackColor = Color.Green
-
+        btnStart.Enabled = True
+        btnStop.Enabled = False
+        lblLoopCheck.Text = ""
     End Sub
 
     Private Sub RandomName_Click(sender As Object, e As EventArgs) Handles RandomName.Click
@@ -25,7 +27,7 @@
 
         strWeb = makeDomainName()
 
-        lblName.Text = "Random domain: " & strWeb
+        lblName.Text = sLblName & strWeb
         txtDomain.Text = strWeb
     End Sub
 
@@ -58,25 +60,66 @@
     End Sub
 
     Private Sub btnStart_Click(sender As Object, e As EventArgs) Handles btnStart.Click
+        iStopper = 0                ' global stopper set to loop
         btnStart.Enabled = False
-        ToolStripStatusLabel1.Text = "Starting ..."     ' call timed algorithm HERE!
+        btnStop.Enabled = True
+        chkDebug.Enabled = False    ' disable debugging
 
-        RandomName_Click(sender, e)         ' first get random domain
+GetDomain:
+        RandomName_Click(sender, e)         ' get random domain
 
-        If txtDomain.Text = "" Then
-            RandomName_Click(sender, e)     ' resend RandomName
-        Else
-            DoGetHostEntry(txtDomain.Text)  ' check name against DNS server
+CheckDomain:
+        ' loop check for unresolvable small domains
+        If lblLoopCheck.Text = txtDomain.Text Then GoTo GetDomain
+        lblLoopCheck.Text = txtDomain.Text  ' set them equal
+
+        DoGetHostEntry(txtDomain.Text)      ' check name against DNS server
+
+        Dim sToolMsg As String = stat01.Text
+        sToolMsg = Microsoft.VisualBasic.Left(sToolMsg, 7)
+
+        If sToolMsg = "Success" Then
+            Console.WriteLine("Success! Getting next random name")
+            stat01.Text = "Success! Getting next random name..."
+
+            Snooze(2)
+            If iStopper = 1 Then Exit Sub
+            GoTo GetDomain
         End If
+
+        Console.WriteLine("Invalid domain, checking extension...")
+        stat01.Text = "Invalid domain, checking extension..."
+
+        Dim sDomainCheck = txtDomain.Text
+        sDomainCheck = Microsoft.VisualBasic.Right(sDomainCheck, 3)
+
+        If sDomainCheck = "com" Then
+            Rnd01_Click(sender, e)  ' fire up random 0 or 1
+
+            Console.WriteLine("Checking domain " & txtDomain.Text)
+            stat01.Text = "Checking domain " & txtDomain.Text
+
+            Snooze(2)
+            If iStopper = 1 Then Exit Sub
+            GoTo CheckDomain
+        End If
+
+        ToCom_Click(sender, e)   'change to dot com
+        Console.WriteLine("Changing extension, checking " & txtDomain.Text)
+        stat01.Text = "Changing extension, checking " & txtDomain.Text
+
+        Snooze(2)
+        If iStopper = 1 Then Exit Sub
+        GoTo CheckDomain
 
         ' first get random domain   [done]
         ' check if it's valid       [done]
-        ' if valid, then get exit/get another random domain
-        ' if not valid, check extension
-        ' if ext is not dot com, change to dot com and check again
-        ' if it is dot com, then randomly choose to minus one OR minus random and check again
+        ' if valid (sSuccess message in status box) [done], then get exit[done]/get another random domain [not done]
+        ' if not valid, check extension [done]
+        ' if ext is not dot com, change to dot com and check again [done]
+        ' if it is dot com, then randomly choose to minus one OR minus random and check again [done]
 
-        ' !!!! NEED TO FLOWCHART THIS SHIZNAZ!!!!!
+        ' ** note: check if same name is checked a second time... if it is, get new domain... it might be a loop
 
     End Sub
 
@@ -87,9 +130,15 @@
     End Sub
 
     Private Sub btnStop_Click(sender As Object, e As EventArgs) Handles btnStop.Click
+        iStopper = 1                    ' change iStopper to stop program
+        stat01.Text = "STOPPING ... PLEASE WAIT ..."
+        Snooze(5)
+        stat01.Text = "READY"
+        lblName.Text = sLblName
+        btnStop.Enabled = False
         btnStart.Enabled = True
-        ToolStripStatusLabel1.Text = "Stopping ..."
-        ' call cleanup algorithm HERE!
+        chkDebug.Enabled = True
+        lblLoopCheck.Text = ""
     End Sub
 
     Private Sub Form1_SizeChanged(sender As Object, e As EventArgs) Handles Me.SizeChanged
@@ -105,4 +154,23 @@
         Me.WindowState = FormWindowState.Normal
         Me.ni.Visible = False
     End Sub
+
+    Private Sub Rnd01_Click(sender As Object, e As EventArgs) Handles Rnd01.Click
+        Dim iRnd As Integer
+        iRnd = myRandom(0, 1)           ' random choice between 0 and 1
+
+        If iRnd = 0 Then                ' minus rand
+            MinusRand_Click(sender, e)
+        End If
+        MinusOne_Click(sender, e)       ' minus one
+    End Sub
+
+    Private Sub Snooze(ByVal seconds As Integer)
+        Console.WriteLine("In the snooze")
+        For i As Integer = 0 To seconds * 100
+            System.Threading.Thread.Sleep(10)
+            Application.DoEvents()
+        Next
+    End Sub
+
 End Class
