@@ -1,11 +1,39 @@
-Imports System.Net
+﻿
 Module Common
-    Public Const sTitle = "ISPiggy"             ' title of program
-    Public Const iMinDomain = 5                 ' minimum word size for domain name
-    Public Const iMaxDomain = 8                 ' maximum word size for domain name
-    Public Const sSuccess = "Success! "         ' message for successful/valid domain
-    Public Const sLblName = "Random Domain: "   ' random domain label set
-    Public iStopper As Integer                  ' declare global stopper
+    Public Const sTitle As String = "ISPiggy"               ' title of program
+    Public Const iMinDomain As Integer = 5                  ' minimum word size for domain name
+    Public Const iMaxDomain As Integer = 8                  ' maximum word size for domain name
+    Public Const sSuccess As String = "Success! "           ' message for successful/valid domain
+    Public Const sLblName As String = "Random Domain: "     ' random domain label set
+    Public iStopper As Integer                              ' tracks events within btnStart click
+
+    '---------------------------------------------------------------------------------------
+    ' Procedure : Snooze
+    ' Purpose   : Controlled pause for specified seconds
+    ' How to Use: Snooze(intSeconds)
+    '---------------------------------------------------------------------------------------
+    Public Sub Snooze(ByVal seconds As Integer)
+        Console.WriteLine("In the snooze")
+        For i As Integer = 0 To seconds * 100
+            System.Threading.Thread.Sleep(10)
+            Application.DoEvents()
+        Next
+    End Sub
+
+    '---------------------------------------------------------------------------------------
+    ' Procedure : cleanStart
+    ' Purpose   : sets all Form1 labels on start / restart
+    ' How to Use: cleanStart()
+    '---------------------------------------------------------------------------------------
+    Public Function cleanStart() As Integer
+        Form1.stat01.Text = "READY"
+        Form1.lblName.Text = sLblName
+        Form1.btnStop.Enabled = False
+        Form1.btnStart.Enabled = True
+        Form1.btnIndicator.BackColor = Color.Green
+        Form1.lblLoopCheck.Text = Nothing
+        cleanStart = Nothing
+    End Function
 
     '---------------------------------------------------------------------------------------
     ' Procedure : myRandom
@@ -30,145 +58,6 @@ Module Common
     End Function
 
     '---------------------------------------------------------------------------------------
-    ' Procedure : toDotCom
-    ' Purpose   : replaces .org and .net extensions to .com
-    ' How to Use: strVar = toDotCom (strVar)
-    '---------------------------------------------------------------------------------------
-    Public Function toDotCom(strToCom As String) As String
-        Dim iLength As Integer
-        Dim iDotLoc As Integer
-        Dim iDomOnly As Integer
-        Dim sDomOnly As String
-
-        iLength = Len(strToCom)          ' get overall domain length
-
-        iDotLoc = InStr(strToCom, ".")   ' get dot location in domain
-
-        iDomOnly = (iLength - (iLength - iDotLoc + 1)) ' get size of domain
-
-        If iDomOnly >= 2 Then               ' domain has at least two chars
-            ' save only domain into variable and add .com
-            sDomOnly = Mid(strToCom, 1, iDomOnly) & ".com"
-
-            strToCom = sDomOnly
-
-        End If
-
-        toDotCom = strToCom
-    End Function
-
-    '---------------------------------------------------------------------------------------
-    ' Procedure : makeDomainName
-    ' Purpose   : makes a random Domain Name
-    ' How to Use: strVar = makeDomainName ()
-    '---------------------------------------------------------------------------------------
-    Public Function makeDomainName() As String
-        Dim sRandWeb As String
-        Dim x As Integer
-
-        Dim astrVowels() As String
-        Dim astrConsonants() As String
-        Dim astrTLDsuffix() As String
-
-        astrVowels = {"a", "e", "i", "o", "u", "y"}
-        astrConsonants = {"c", "d", "f", "h", "l", "m", "n", "r", "s", "t"}
-        astrTLDsuffix = {".com", ".com", ".net", ".org"}
-
-        sRandWeb = ""
-        x = 0
-
-        While (x < myRandom(iMinDomain, iMaxDomain))
-            If (isOdd(x) = 1) Then
-                sRandWeb = sRandWeb & astrVowels(myRandom(0, UBound(astrVowels)))
-            Else
-                sRandWeb = sRandWeb & astrConsonants(myRandom(0, UBound(astrConsonants)))
-            End If
-            x = x + 1
-        End While
-
-        Dim intDom As Integer       ' get random domain suffix
-        intDom = myRandom(0, UBound(astrTLDsuffix))
-
-        makeDomainName = sRandWeb & astrTLDsuffix(intDom)
-    End Function
-
-    '---------------------------------------------------------------------------------------
-    ' Procedure : domainMinusOne
-    ' Purpose   : shortens domain name by one char at the end
-    ' How to Use: strVar = domainMinusOne (strVar)
-    '---------------------------------------------------------------------------------------
-    Public Function domainMinusOne(strDomain As String)
-        Dim iLength As Integer
-        Dim iDotLoc As Integer
-        Dim iDomOnly As Integer
-        Dim sDomOnly As String
-        Dim sExtOnly As String
-
-        iLength = Len(strDomain)          ' get overall domain length
-
-        iDotLoc = InStr(strDomain, ".")   ' get dot location in domain
-
-        iDomOnly = (iLength - (iLength - iDotLoc + 1)) ' get size of domain
-
-        If iDomOnly >= 3 Then                     ' domain has at least two chars
-
-            sDomOnly = Mid(strDomain, 1, iDomOnly)  ' save only domain into variable
-
-            ' save extension into variable
-            sExtOnly = Mid(strDomain, iDotLoc, iLength - iDotLoc + 1)
-
-            ' remove last char in domain name and reassemble domain name
-            sDomOnly = Mid(sDomOnly, 1, iDotLoc - 2) & sExtOnly
-
-            strDomain = sDomOnly  ' puts new domain in passed domain variable
-
-        End If
-
-        domainMinusOne = strDomain
-    End Function
-
-    '---------------------------------------------------------------------------------------
-    ' Procedure : domainMinusRand
-    ' Purpose   : shortens domain name by one random char
-    ' How to Use: strVar = domainMinusRand (strVar)
-    '---------------------------------------------------------------------------------------
-    Public Function domainMinusRand(strDomain As String)
-        Dim iLength As Integer
-        Dim iDotLoc As Integer
-        Dim iDomOnly As Integer
-        Dim iRndChar As Integer
-        Dim sDomOnly As String
-        Dim sExtOnly As String
-        Dim sRndChar As String
-
-        iLength = Len(strDomain)          ' get overall domain length
-
-        iDotLoc = InStr(strDomain, ".")   ' get dot location in domain
-
-        iDomOnly = (iLength - (iLength - iDotLoc + 1)) ' get size of domain
-
-        If iDomOnly >= 3 Then                     ' domain has at least two chars
-
-            sDomOnly = Mid(strDomain, 1, iDomOnly)  ' save only domain into variable
-
-            ' save extension into variable
-            sExtOnly = Mid(strDomain, iDotLoc, iLength - iDotLoc + 1)
-
-            iRndChar = myRandom(1, iDomOnly)    ' get random char int location from domain length
-
-            sRndChar = Mid(sDomOnly, iRndChar, 1) ' gets random char from domain
-
-            ' remove char from domain and reassemble domain name
-            sDomOnly = Replace(sDomOnly, sRndChar, "", , 1) & sExtOnly
-
-            strDomain = sDomOnly  ' puts new domain in passed domain variable
-
-        End If
-
-        domainMinusRand = strDomain
-    End Function
-
-    '---------------------------------------------------------------------------------------
     ' Procedure : checkDebugMode
     ' Purpose   : checks status of debug mode and sets Form1 accordingly
     ' How to Use: strVar = checkDebugMode ()
@@ -178,10 +67,10 @@ Module Common
             frm.Size = New Size(580, 150)               ' sets debug form size
             frm.MaximumSize = New Size(580, 150)        ' disables resizing up
             frm.MinimumSize = New Size(580, 150)        ' disables resizing down
-            Form1.stat01.text = "Entering interactive DEBUG mode"
+            Form1.stat01.Text = "Entering interactive DEBUG mode"
 
-            Form1.btnStart.Enabled = False                ' disable stop and start buttons
-            Form1.btnStop.Enabled = False
+            Form1.btnStart.Enabled = False                ' disable start button
+            Form1.btnStop.Enabled = True
 
         Else                                    ' we are in production mode
             frm.Size = New Size(320, 150)               ' sets production form size
@@ -189,41 +78,11 @@ Module Common
             frm.MinimumSize = New Size(320, 150)        ' disables resizing down
             Form1.stat01.Text = "Press START to Begin"
 
-            Form1.btnStart.Enabled = True      ' enable start button
-            Form1.lblName.Text = sLblName      ' resets domain text
-
+            Form1.btnStart.Enabled = True               ' enable start button
+            Form1.lblName.Text = sLblName         ' resets domain text
         End If
 
         checkDebugMode = 0
-    End Function
-
-    Public Function DoGetHostEntry(hostName As String)
-        Form1.btnIndicator.BackColor = Color.Red  ' visual wait indicator
-        Form1.GetIP.Enabled = False       ' disable the button to avoid a double press
-        Form1.stat01.Text = "WORKING HARD... PLEASE WAIT..."
-        Form1.Refresh()          'needed to paint the the shapes before next operation
-
-        Try
-            Dim host As IPHostEntry = Dns.GetHostEntry(hostName)
-            Dim sMyString As String
-            sMyString = ""
-
-            Dim ip As IPAddress() = host.AddressList
-
-            sMyString = ip(0).ToString()    ' get first IP returned from DNS server
-            Form1.stat01.Text = sSuccess & sMyString & " Found!"
-
-        Catch ex As System.Net.Sockets.SocketException
-            Form1.stat01.Text = ex.Message & "... trying next host..."
-        Catch ex As System.Exception
-            Form1.stat01.Text = ex.Message
-        Finally
-        End Try
-
-        Form1.btnIndicator.BackColor = Color.Green  ' visual indicator
-        Form1.GetIP.Enabled = True
-
-        DoGetHostEntry = ""
     End Function
 
 End Module
