@@ -1,16 +1,14 @@
 ﻿Public Class Form1
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.Text = sTitle
-        chkDebug.Checked = False
         MaximizeBox = False                 ' disable maximize button
         ni.Visible = False
 
-        Dim frmForm As Form                 ' checks the status of chkDebug
-        frmForm = Me
-        checkDebugMode(frmForm)
+        chkDebug.Checked = False
+        checkDebugMode()
 
-        Randomize()
         cleanStart()
+        Randomize()
     End Sub
 
     Private Sub RandomName_Click(sender As Object, e As EventArgs) Handles RandomName.Click
@@ -35,19 +33,18 @@
     End Sub
 
     Private Sub ToCom_Click(sender As Object, e As EventArgs) Handles ToCom.Click
-        Dim strDomainName As String
-        strDomainName = txtDomain.Text
-        strDomainName = toDotCom(strDomainName)
-        txtDomain.Text = strDomainName
+        Dim strDomain As String
+        strDomain = txtDomain.Text
+        strDomain = toDotCom(strDomain)
+        txtDomain.Text = strDomain
     End Sub
 
     Private Sub GetIP_Click(sender As Object, e As EventArgs) Handles GetIP.Click
         DoGetHostEntry(txtDomain.Text)
     End Sub
+
     Private Sub chkDebug_CheckedChanged(sender As Object, e As EventArgs) Handles chkDebug.CheckedChanged
-        Dim frmForm As Form
-        frmForm = Me
-        checkDebugMode(frmForm)
+        checkDebugMode()
     End Sub
 
     Private Sub Form1_SizeChanged(sender As Object, e As EventArgs) Handles Me.SizeChanged
@@ -87,7 +84,6 @@ CheckDomain:
         sToolMsg = Microsoft.VisualBasic.Left(sToolMsg, 7)
 
         If sToolMsg = "Success" Then
-            Console.WriteLine("Success! Getting next random name")
             Console.WriteLine(stat01.Text)
 
             Snooze(5)                       ' wait for 5 seconds
@@ -146,8 +142,9 @@ CheckDomain:
 
         If iRnd = 0 Then                ' minus rand
             MinusRand_Click(sender, e)
+        Else
+            MinusOne_Click(sender, e)   ' minus one
         End If
-        MinusOne_Click(sender, e)       ' minus one
     End Sub
 
 End Class

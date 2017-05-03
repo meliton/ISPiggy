@@ -5,13 +5,13 @@ Module DNS_Stuff
     ' Purpose   : replaces .org and .net extensions to .com
     ' How to Use: strVar = toDotCom (strVar)
     '---------------------------------------------------------------------------------------
-    Public Function toDotCom(strToCom As String) As String
+    Public Function toDotCom(strToCom As String)
         Dim iLength As Integer
         Dim iDotLoc As Integer
         Dim iDomOnly As Integer
 
-        iLength = Len(strToCom)          ' get overall domain length
-        iDotLoc = InStr(strToCom, ".")   ' get dot location in domain
+        iLength = Len(strToCom)             ' get overall domain length
+        iDotLoc = InStr(strToCom, ".")      ' get dot location in domain
         iDomOnly = (iLength - (iLength - iDotLoc + 1)) ' get size of domain
 
         If iDomOnly >= 2 Then               ' domain has at least two chars
@@ -30,7 +30,6 @@ Module DNS_Stuff
         Dim iLength As Integer
         Dim iDotLoc As Integer
         Dim iDomOnly As Integer
-        Dim sDomOnly As String
         Dim sExtOnly As String
 
         iLength = Len(strDomain)          ' get overall domain length
@@ -38,14 +37,14 @@ Module DNS_Stuff
         iDomOnly = (iLength - (iLength - iDotLoc + 1)) ' get size of domain
 
         If iDomOnly >= 3 Then                       ' domain has at least two chars
-            sDomOnly = Mid(strDomain, 1, iDomOnly)  ' save only domain into variable
             ' save extension into variable
             sExtOnly = Mid(strDomain, iDotLoc, iLength - iDotLoc + 1)
-            ' remove last char in domain name and reassemble domain name
-            sDomOnly = Mid(sDomOnly, 1, iDotLoc - 2) & sExtOnly
-            strDomain = sDomOnly  ' puts new domain in passed domain variable
-        End If
+            strDomain = Mid(strDomain, 1, iDomOnly)  ' save only domain into variable
 
+            ' remove last char in domain name and reassemble domain name
+            domainMinusOne = Mid(strDomain, 1, iDotLoc - 2) & sExtOnly
+            strDomain = domainMinusOne  ' puts new domain in passed domain variable
+        End If
         domainMinusOne = strDomain
     End Function
 
@@ -59,7 +58,6 @@ Module DNS_Stuff
         Dim iDotLoc As Integer
         Dim iDomOnly As Integer
         Dim iRndChar As Integer
-        Dim sDomOnly As String
         Dim sExtOnly As String
         Dim sRndChar As String
 
@@ -68,15 +66,17 @@ Module DNS_Stuff
         iDomOnly = (iLength - (iLength - iDotLoc + 1)) ' get size of domain
 
         If iDomOnly >= 3 Then                       ' domain has at least two chars
-            sDomOnly = Mid(strDomain, 1, iDomOnly)  ' save only domain into variable
-            sExtOnly = Mid(strDomain, iDotLoc, iLength - iDotLoc + 1)   ' save extension into variable
-            iRndChar = myRandom(1, iDomOnly)        ' get random char int location from domain length
-            sRndChar = Mid(sDomOnly, iRndChar, 1)   ' gets random char from domain
-            ' remove char from domain and reassemble domain name
-            sDomOnly = Replace(sDomOnly, sRndChar, "", , 1) & sExtOnly
-            strDomain = sDomOnly  ' puts new domain in passed domain variable
-        End If
+            ' save extension into variable
+            sExtOnly = Mid(strDomain, iDotLoc, iLength - iDotLoc + 1)
+            strDomain = Mid(strDomain, 1, iDomOnly)  ' save only domain into variable
 
+            iRndChar = myRandom(1, iDomOnly)        ' get random char int location from domain length
+            sRndChar = Mid(strDomain, iRndChar, 1)  ' gets random char from domain
+
+            ' remove char from domain and reassemble domain name
+            domainMinusRand = Replace(strDomain, sRndChar, "", , 1) & sExtOnly
+            strDomain = domainMinusRand         ' puts new domain in passed domain variable
+        End If
         domainMinusRand = strDomain
     End Function
 
@@ -87,7 +87,7 @@ Module DNS_Stuff
     '---------------------------------------------------------------------------------------
     Public Function makeDomainName() As String
         Dim sRandWeb As String
-        Dim intDom As Integer
+        Dim iDomain As Integer
         Dim x As Integer
 
         Dim astrVowels() As String
@@ -110,16 +110,16 @@ Module DNS_Stuff
             x = x + 1
         End While
 
-        intDom = myRandom(0, UBound(astrTLDsuffix)) ' get random domain suffix
+        iDomain = myRandom(0, UBound(astrTLDsuffix)) ' get random domain suffix
 
-        makeDomainName = sRandWeb & astrTLDsuffix(intDom)
+        makeDomainName = sRandWeb & astrTLDsuffix(iDomain)
     End Function
 
     Public Function DoGetHostEntry(hostName As String)
-        Form1.btnIndicator.BackColor = Color.Red  ' visual wait indicator
-        Form1.GetIP.Enabled = False       ' disable the button to avoid a double press
+        Form1.btnIndicator.BackColor = Color.Red    ' set visual wait indicator
+        Form1.GetIP.Enabled = False     ' disable the button to avoid a double press
         Form1.stat01.Text = "WORKING HARD... PLEASE WAIT..."
-        Form1.Refresh()          'needed to paint the the shapes before next operation
+        Form1.Refresh()                 ' paint the the shapes before next operation
 
         Try
             Dim host As IPHostEntry = Dns.GetHostEntry(hostName)
@@ -131,20 +131,20 @@ Module DNS_Stuff
 
             sMyString = ip(0).ToString()    ' get first IP returned from DNS server
             Form1.stat01.Text = sSuccess & sMyString & " Found!"
-            GC.Collect()
+            GC.Collect()        ' garbage collection for unclaimed memory
 
         Catch ex As System.Net.Sockets.SocketException
             Form1.stat01.Text = ex.Message & "... trying next host..."
-            GC.Collect()
+            GC.Collect()        ' garbage collection for unclaimed memory
         Catch ex As System.Exception
             Form1.stat01.Text = ex.Message
-            GC.Collect()
+            GC.Collect()        ' garbage collection for unclaimed memory
         Finally
-            GC.Collect()
+            GC.Collect()        ' garbage collection for unclaimed memory
         End Try
-        GC.Collect()
+        GC.Collect()            ' garbage collection for unclaimed memory
 
-        Form1.btnIndicator.BackColor = Color.Green  ' visual indicator
+        Form1.btnIndicator.BackColor = Color.Green  ' set visual indicator
         Form1.GetIP.Enabled = True
 
         DoGetHostEntry = Nothing

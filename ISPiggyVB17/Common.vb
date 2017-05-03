@@ -1,11 +1,11 @@
 ﻿
 Module Common
-    Public Const sTitle As String = "ISPiggy"               ' title of program
-    Public Const iMinDomain As Integer = 5                  ' minimum word size for domain name
-    Public Const iMaxDomain As Integer = 8                  ' maximum word size for domain name
-    Public Const sSuccess As String = "Success! "           ' message for successful/valid domain
-    Public Const sLblName As String = "Random Domain: "     ' random domain label set
-    Public iStopper As Integer                              ' tracks events within btnStart click
+    Public Const sTitle As String = "ISPiggy"           ' title of program
+    Public Const iMinDomain As Integer = 5              ' minimum word size for domain name
+    Public Const iMaxDomain As Integer = 8              ' maximum word size for domain name
+    Public Const sSuccess As String = "Success! "       ' message for successful/valid domain
+    Public Const sLblName As String = "Random Domain: " ' random domain label set
+    Public iStopper As Integer                          ' tracks events within btnStart click
 
     '---------------------------------------------------------------------------------------
     ' Procedure : Snooze
@@ -25,15 +25,14 @@ Module Common
     ' Purpose   : sets all Form1 labels on start / restart
     ' How to Use: cleanStart()
     '---------------------------------------------------------------------------------------
-    Public Function cleanStart() As Integer
+    Public Sub cleanStart()
         Form1.stat01.Text = "READY"
         Form1.lblName.Text = sLblName
         Form1.btnStop.Enabled = False
         Form1.btnStart.Enabled = True
         Form1.btnIndicator.BackColor = Color.Green
         Form1.lblLoopCheck.Text = Nothing
-        cleanStart = Nothing
-    End Function
+    End Sub
 
     '---------------------------------------------------------------------------------------
     ' Procedure : myRandom
@@ -60,29 +59,27 @@ Module Common
     '---------------------------------------------------------------------------------------
     ' Procedure : checkDebugMode
     ' Purpose   : checks status of debug mode and sets Form1 accordingly
-    ' How to Use: strVar = checkDebugMode ()
+    ' How to Use: checkDebugMode ()
     '---------------------------------------------------------------------------------------
-    Public Function checkDebugMode(ByVal frm As Form)
-        If Form1.chkDebug.Checked Then          ' we are in debug mode
-            frm.Size = New Size(580, 150)               ' sets debug form size
-            frm.MaximumSize = New Size(580, 150)        ' disables resizing up
-            frm.MinimumSize = New Size(580, 150)        ' disables resizing down
+    Public Sub checkDebugMode()
+        If Form1.chkDebug.Checked Then          ' we are in debug mode, checked
+            Form1.Size = New Size(580, 150)               ' sets debug form size
+            Form1.MaximumSize = New Size(580, 150)        ' disables resizing up
+            Form1.MinimumSize = New Size(580, 150)        ' disables resizing down
             Form1.stat01.Text = "Entering interactive DEBUG mode"
 
             Form1.btnStart.Enabled = False                ' disable start button
             Form1.btnStop.Enabled = True
 
-        Else                                    ' we are in production mode
-            frm.Size = New Size(320, 150)               ' sets production form size
-            frm.MaximumSize = New Size(320, 150)        ' disables resizing up
-            frm.MinimumSize = New Size(320, 150)        ' disables resizing down
+        Else                                    ' we are in production mode, unchecked
+            Form1.Size = New Size(320, 150)               ' sets production form size
+            Form1.MaximumSize = New Size(320, 150)        ' disables resizing up
+            Form1.MinimumSize = New Size(320, 150)        ' disables resizing down
             Form1.stat01.Text = "Press START to Begin"
 
             Form1.btnStart.Enabled = True               ' enable start button
-            Form1.lblName.Text = sLblName         ' resets domain text
+            Form1.lblName.Text = sLblName               ' resets domain text
         End If
-
-        checkDebugMode = 0
-    End Function
+    End Sub
 
 End Module
